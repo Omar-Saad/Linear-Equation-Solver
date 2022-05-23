@@ -11,7 +11,7 @@ import constants
 
 class EquationEntryScreen(Toplevel):
 
- def __init__(self,master,metodName,numOfEquations=3):
+ def __init__(self,master,metodName,numOfEquations):
         super().__init__(master =master )
 
         self.title("Linear Equations Solver")
@@ -21,7 +21,7 @@ class EquationEntryScreen(Toplevel):
         
             
         self.window_width = 750
-        self.window_height = 350
+        self.window_height = 200+numOfEquations*50
 
         # get the screen dimension
         screen_width = self.winfo_screenwidth()
@@ -40,22 +40,22 @@ class EquationEntryScreen(Toplevel):
         smallFont = (FONT, 14)
         
 
-        welcomeLabel = ttk.Label(self, text="Equation Entry", font=largeFont)
+        welcomeLabel = ttk.Label(self, text="Equation Entry for {} method".format(self.methodName), font=largeFont)
         
 
         
        
 
-        button = ttk.Button(self, text ="Solve Equations")
+        
         # command = lambda : self.plot_function())
           
         # welcomeLabel.pack()
-        welcomeLabel.grid(row = 0, column = 1, padx = 10, pady = 10)
+        welcomeLabel.grid(row = 0, column = 0, padx = 8, pady = 8,sticky='W',columnspan=2,rowspan=1)
         self.functions_entry = []
 
 
         for i in range(numOfEquations):
-            funLabel = ttk.Label(self, text="Function {}".format(i), font=mediumFont)
+            funLabel = ttk.Label(self, text="Function {}".format(i+1), font=mediumFont)
             funEntry = ttk.Entry(self, width=20,font = smallFont)
             
             self.functions_entry.append(funEntry)
@@ -68,8 +68,19 @@ class EquationEntryScreen(Toplevel):
         iterationsEntry = ttk.Entry(self, width=20,font = smallFont)
         self.iterationsEntry = iterationsEntry
 
+        epsilonLabel = ttk.Label(self, text="Default Epsilon", font=mediumFont)
+        epsilonEntry = ttk.Entry(self, width=20,font = smallFont)
+        epsilonEntry.insert(0,"0.00001")
+        self.epsilonEntry = epsilonEntry
+        
+
         iterationsLabel.grid(row = numOfEquations+2, column = 0, padx = 10, pady = 10)
         iterationsEntry.grid(row = numOfEquations+2, column = 1, padx = 10, pady = 10)
+
+        epsilonLabel.grid(row = numOfEquations+3, column = 0, padx = 10, pady = 10)
+        epsilonEntry.grid(row = numOfEquations+3, column = 1, padx = 10, pady = 10)
+
+        button = ttk.Button(self, text ="Solve Equations")
 
         if self.methodName == constants.METHODS_NAME[3]:
             # TODO : Arguments name
@@ -90,4 +101,35 @@ class EquationEntryScreen(Toplevel):
             arg3Label.grid(row = numOfEquations+3, column = 2, padx = 10, pady = 10)
 
 
-        button.grid(row = numOfEquations+1, column = 1, padx = 10, pady = 10)
+        button.grid(row = numOfEquations+4, column = 1, padx = 10, pady = 10)
+
+
+        
+        def getEpsilon(self):
+            try:
+                return float(self.epsilonEntry.get())
+            except ValueError:
+                messagebox.showerror("Error", "Epsilon must be a number")
+                return None
+
+
+        def getMethodName(self):
+            return self.methodName
+
+        def getNumberOfIetrations(self):
+            try:
+                num = int(self.iterationsEntry.get())
+                if num>0:
+                    return num
+                else:
+                    messagebox.showerror("Error", "Number of iterations must be positive")
+                    return None
+            except:
+                messagebox.showerror("Error","Number of Ietrations Must be an integer")
+                return None
+
+        def getFunctions(self):
+            functions = []
+            for i in range(numOfEquations):
+                functions.append(self.functions_entry[i].get())
+            return functions

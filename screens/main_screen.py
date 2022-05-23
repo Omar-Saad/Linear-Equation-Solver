@@ -94,23 +94,19 @@ class MainScreen(tk.Tk):
    
    
     def goButtonCallback(self):
-         if self.getNumberOfEquations() == "":
-            messagebox.showerror("Error","Please enter the number of equations")
-            return
-
-         if not self.getNumberOfEquations().isdigit():
-            messagebox.showerror("Error","Number of Equations Must be a number")
-            return
-
-
-        
-         return EquationEntryScreen(self , self.getMethodName())
+    
+         return EquationEntryScreen(self , self.getMethodName() , self.getNumberOfEquations())
 
     def getMethodName(self):
         return self.clicked.get()
     
     def getNumberOfEquations(self):
-        return self.numberOfEquationsEntry.get()
+        try :
+            return int(self.numberOfEquationsEntry.get())
+        except:
+            messagebox.showerror("Error","Number of Equations Must be a number")
+            return None
+        # return self.numberOfEquationsEntry.get()
     
 
     def show(self):
