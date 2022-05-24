@@ -3,12 +3,84 @@ from sympy import *
 
 
 class EquationParser:
-    def __init__(self, file_path):
+    def __init__(self):
         self.method_name = None
         self.num_of_equations = None
         self.A = None
         self.B = None
         self.variables = None
+
+
+    
+    def replace_operations_from_string(self,func):
+
+        func = func.replace(" ","").lower()
+        
+        op = {
+            'sin':'np.sin',
+            'cos':'np.cos',
+            'tan':'np.tan',
+            'log':'np.log',
+            'exp':'np.exp',
+            'sqrt':'np.sqrt',
+            '^':'**',
+            'ln':'np.log',
+            'pi':'np.pi',
+            }
+        for i in op:
+            func = func.replace(i,op[i])
+
+        return func
+
+    
+
+    def parseFunctions(self,functions):
+        variables = set()
+
+        for line in functions:
+            for c in line:
+                if c.isalpha():
+                    variables.add(c)
+ 
+
+
+        variables = list(variables)
+        variables.sort()
+        n = len(variables)
+
+        # print(num_of_equations)
+        # print(method_name)
+        # print(variables)
+
+        # A*X = B
+
+        A = numpy.zeros(shape=(n, n))
+        B = numpy.zeros(shape=(n, 1))
+        equations = []
+        for f in functions:
+            equations.append(self.replace_operations_from_string(f.strip()))
+
+        for i, line in enumerate(equations):
+            expr = sympify(line)
+
+            for j, c in enumerate(variables):
+                A[i, j] = expr.coeff(c)
+            
+            
+            expr = Poly(expr, symbols(", ".join(variables)))
+            nums = expr.coeffs()
+
+            B[i] = -1 * nums.pop()
+        
+        self.init_values = None
+        
+        
+        self.A = A
+        self.B = B
+        self.variables = variables
+
+        return A,B,variables
+
 
 
     def readFunctionFromFile(self,fileName):

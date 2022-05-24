@@ -113,30 +113,5 @@ class MainScreen(tk.Tk):
         self.label.config( text = self.clicked.get() )
   
 
-    def replace_operations_from_string(self,func):
-
-        func = func.replace(" ","").lower()
-        
-        op = {
-            'sin':'np.sin',
-            'cos':'np.cos',
-            'tan':'np.tan',
-            'log':'np.log',
-            'exp':'np.exp',
-            'sqrt':'np.sqrt',
-            '^':'**',
-            'ln':'np.log',
-            'pi':'np.pi',
-            }
-        for i in op:
-            func = func.replace(i,op[i])
-
-        return func
-
-    
-
-
-
-
 
 
