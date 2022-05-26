@@ -12,7 +12,7 @@ import constants
 class ResultsScreen(Toplevel):
 
     # resuls : is an array consists of var. results and number of iterations and execution time
-    def __init__(self,master,metodName,numOfEquations,variables,results = [1,2,3,4,5]):
+    def __init__(self,master,metodName,numOfEquations,variables,results ):
         super().__init__(master =master )
 
         self.title("Linear Equations Solver")
@@ -54,6 +54,10 @@ class ResultsScreen(Toplevel):
         numIetrationsLabel = ttk.Label(self, text="Number of Ietrations : {}".format(results[numOfEquations]), font=largeFont)
             
         numIetrationsLabel.grid(row = numOfEquations+1, column = 0, padx = 8, pady = 8,sticky='W',columnspan=2,rowspan=1)
+
+        executionTimeLabel = ttk.Label(self, text="Execution Time : {}".format(results[-1]), font=largeFont)
+            
+        executionTimeLabel.grid(row = numOfEquations+2, column = 0, padx = 8, pady = 8,sticky='W',columnspan=2,rowspan=1)
 
         # welcomeLabel.pack()
         

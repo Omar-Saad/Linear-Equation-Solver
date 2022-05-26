@@ -63,9 +63,6 @@ class EquationSolver:
 
 
 
-
-
-
     def lu_decomp(self,a, b, n, tol):
         s = np.zeros(shape=(n, 1))
         o = np.zeros(shape=(n, 1)).astype(int)

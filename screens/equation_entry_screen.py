@@ -11,6 +11,7 @@ import constants
 from methods.equation_solver import EquationSolver
 from screens.results_screen import ResultsScreen
 from utils.parser import EquationParser
+import time
 
 
 class EquationEntryScreen(Toplevel):
@@ -68,6 +69,7 @@ class EquationEntryScreen(Toplevel):
 
         iterationsLabel = ttk.Label(self, text="Number of Iterations", font=mediumFont)
         iterationsEntry = ttk.Entry(self, width=20, font=smallFont)
+        iterationsEntry.insert(0, "50")
         self.iterationsEntry = iterationsEntry
 
         epsilonLabel = ttk.Label(self, text="Default Epsilon", font=mediumFont)
@@ -148,16 +150,47 @@ class EquationEntryScreen(Toplevel):
         
         results = []
 
-        if self.methodName == constants.METHODS_NAME[1]:
+        if self.methodName == constants.METHODS_NAME[0]:
+            # Gaussian-elimination
             # TODO
             solver = EquationSolver()
-            # print(A)
-            # print(B)
-            # print( len(varaibles))
-            # print(self.getEpsilon())
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
-            results+=[4,5]
+            
+            start_time = time.time()
+            results = solver.gaussElimination(np.concatenate((A, B), axis=1), len(varaibles))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
 
-        # results = [1,2,3,4,5]
+
+        if self.methodName == constants.METHODS_NAME[1]:
+            # LU decomposition
+            # TODO
+            solver = EquationSolver()
+            
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+        
+        if self.methodName == constants.METHODS_NAME[2]:
+            # Gaussian-Jordan
+            # TODO
+            solver = EquationSolver()
+      
+            
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+
+        if self.methodName == constants.METHODS_NAME[3]:
+            # Gauss-Seidel
+            # TODO
+            solver = EquationSolver()
+         
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+
+        
 
         return ResultsScreen(self, self.getMethodName(), self.numOfEquations , varaibles , results)

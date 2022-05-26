@@ -6,6 +6,7 @@
 # sys.path.insert(1, p)
 
 
+from utils.parser import EquationParser
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
@@ -14,11 +15,16 @@ import matplotlib as plt
 from tkinter import messagebox
 from tkinter import OptionMenu
 from tkinter import Toplevel
+from methods.equation_solver import EquationSolver
+import time
 
 
 from screens.equation_entry_screen import EquationEntryScreen
 
 import constants
+from screens.results_screen import ResultsScreen
+from tkinter import filedialog
+
 
 
 # Main Gui Screen for the application
@@ -77,6 +83,10 @@ class MainScreen(tk.Tk):
         button = ttk.Button(self, text ="Go to Enter Equtions")
         # ,command = lambda : self.show())
         button.bind("<Button>",lambda e:self.goButtonCallback())
+
+        solveFilebutton = ttk.Button(self, text ="Input Equations from File")
+        # ,command = lambda : self.show())
+        solveFilebutton.bind("<Button>",lambda e:self.solveFromFileButtonCallback())
  
 # btn.pack(pady = 10)
           
@@ -90,12 +100,67 @@ class MainScreen(tk.Tk):
         self.numberOfEquationsEntry.grid(row = 2, column = 1, padx = 10, pady = 10)
 
    
-        button.grid(row = 3, column = 1, padx = 10, pady = 10)
+        button.grid(row = 3, column = 1, padx =10, pady = 10 , columnspan=1)
+
+        solveFilebutton.grid(row = 4, column = 1, padx = 10, pady = 10,columnspan=1)
    
    
     def goButtonCallback(self):
     
          return EquationEntryScreen(self , self.getMethodName() , self.getNumberOfEquations())
+
+
+    def solveFromFileButtonCallback(self):
+        file_path = filedialog.askopenfilename()
+        parser = EquationParser()
+        parser.readFunctionFromFile(file_path)
+        A = parser.A
+        B = parser.B
+        variables = parser.variables
+
+        if self.methodName == constants.METHODS_NAME[0]:
+            # Gaussian-elimination
+            # TODO
+            solver = EquationSolver()
+            
+            start_time = time.time()
+            results = solver.gaussElimination(np.concatenate((A, B), axis=1), len(variables))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+
+        if self.methodName == constants.METHODS_NAME[1]:
+            # LU decomposition
+            # TODO
+            solver = EquationSolver()
+            
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+            
+        if self.methodName == constants.METHODS_NAME[2]:
+            # Gaussian-Jordan
+            # TODO
+            solver = EquationSolver()
+    
+            
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+
+        if self.methodName == constants.METHODS_NAME[3]:
+            # Gauss-Seidel
+            # TODO
+            solver = EquationSolver()
+        
+            start_time = time.time()
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
+            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+
+
+    
+        return ResultsScreen(self , parser.method_name.strip() , int(parser.num_of_equations), parser.variables , [1,2,3,4])  
 
     def getMethodName(self):
         return self.clicked.get()
