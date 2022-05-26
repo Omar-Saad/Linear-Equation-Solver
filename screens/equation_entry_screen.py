@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
+from unittest import result
 import numpy as np
 import matplotlib as plt
 from tkinter import messagebox
 from tkinter import OptionMenu
 from tkinter import Toplevel
 import constants
+from methods.equation_solver import EquationSolver
 from screens.results_screen import ResultsScreen
 from utils.parser import EquationParser
 
@@ -143,11 +145,19 @@ class EquationEntryScreen(Toplevel):
         except:
             messagebox.showerror("Error", "Invalid Equation")
             return
+        
+        results = []
 
-        if self.methodName == constants.METHODS_NAME[0]:
+        if self.methodName == constants.METHODS_NAME[1]:
             # TODO
-            pass
+            solver = EquationSolver()
+            # print(A)
+            # print(B)
+            # print( len(varaibles))
+            # print(self.getEpsilon())
+            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
+            results+=[4,5]
 
-        results = [1,2,3,4,5]
+        # results = [1,2,3,4,5]
 
         return ResultsScreen(self, self.getMethodName(), self.numOfEquations , varaibles , results)

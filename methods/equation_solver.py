@@ -6,13 +6,72 @@ import sys
 
 class EquationSolver:
 
-    def __init__(self, equations):
-        self.equation = equations
+    # def __init__(self):
+        # self.equation = equations
+            # pass
+    def LUdecomposition(self,a, n):
+        L = np.zeros((n, n))
+        U = np.zeros((n, n))
+        x = np.zeros(shape=(n, 1))
+
+        for i in range(n):
+            for j in range(n):
+                U[i][j] = a[i][j]  #U is the same as a but without answers (a --> augmented matrix,  U --> not augmented)
+                if i == j:
+                    L[i][j] = 1  #diagonals = 1
+                else:
+                    L[i][j] = 0
+
+        # Forward Elimination
+        for i in range(n):
+            if U[i][i] == 0.0:
+                # root_label.config(text="Division by zero")
+                # root_label.grid(row=2, column=5)
+                raise ValueError('Division by zero')
+                return None
+
+            for j in range(i + 1, n):
+                ratio = U[j][i] / U[i][i]
+                L[j][i] = ratio  #lower triangular matrix containing ratios
+
+                for k in range(n):  #eliminate (to construct an upper triangular matrix)
+                    U[j][k] = U[j][k] - ratio * U[i][k]
+
+        # Forward Substitution  (L * y = b)
+        y = np.zeros(n)
+        y[0] = a[0][n]  #answer in the augmented matrix
+
+        for i in range(1, n):
+            y[i] = a[i][n]  #results
+
+            for j in range(i):
+                y[i] = y[i] - L[i][j] * y[j]  #There is no coeff. division as diagonals = 1 in L
+
+        # Back Substitution (U * x = y)
+        x[n - 1] = y[n - 1] / U[n - 1][n - 1]
+
+        for i in range(n - 2, -1, -1):
+            x[i] = y[i]  #results
+
+            for j in range(i + 1, n):
+                x[i] = x[i] - U[i][j] * x[j]
+
+            x[i] = x[i] / U[i][i]
+        return x
 
 
-    def lu_decomp(a, b, n, x, tol, er):
+
+
+
+
+
+
+    def lu_decomp(self,a, b, n, tol):
         s = np.zeros(shape=(n, 1))
-        o = np.zeros(shape=(n, 1))
+        o = np.zeros(shape=(n, 1)).astype(int)
+
+
+        x = np.zeros(shape=(n, 1))
 
         er = 0
 
@@ -25,9 +84,12 @@ class EquationSolver:
 
         for k in range(n - 1):
             p = k
-            big = abs(a[o[k]][k] / s[o[k]])
+            big = abs(a[o[k]][k] / s[int(o[k])])
+            print('big ',big)
+
             for i in range(k + 1, n):
-                dummy = abs(a[o[i]][k] / s[o[i]])
+                dummy = abs(a[o[i]][k] / s[int(o[i])])
+                print('dummy ',dummy)
                 if dummy > big:
                     big = dummy
                     p = i
@@ -35,7 +97,7 @@ class EquationSolver:
             o[p] = o[k]
             o[k] = dummy
 
-            if (abs(a[o[k]][k]) / s[o[k]]) < tol:
+            if (abs(a[int(o[k])][k]) / s[int(o[k])]) < tol:
                 er = -1
                 return
             for i in range(k + 1, n):
@@ -61,6 +123,8 @@ class EquationSolver:
                 for j in range(i + 1, n):
                     sum += a[o[i]][j] * x[j]
                 x[i] = (y[o[i]] - sum) / a[o[i]][i]
+
+        return x
                 
     
     def gaussElimination(self):
