@@ -66,11 +66,24 @@ class EquationParser:
             for j, c in enumerate(variables):
                 A[i, j] = expr.coeff(c)
             
+            # get last number b in from the equation
             
             expr = Poly(expr, symbols(", ".join(variables)))
-            nums = expr.coeffs()
 
-            B[i] = -1 * nums.pop()
+            nums = expr.coeffs()
+            # print('nums' , nums)
+            
+            
+            # print('l = ',expr.free_symbols)
+            if len(expr.free_symbols) +1 == len(nums):
+                B[i] = -1 * nums.pop()
+            else:
+                B[i] = 0
+            # print('B[i] = ',B[i])
+
+            # if(len(B) != len(variables)):
+            #     B[i]
+        
         
         self.init_values = None
         
@@ -122,9 +135,13 @@ class EquationParser:
             
             
             expr = Poly(expr, symbols(", ".join(variables)))
+            
             nums = expr.coeffs()
 
-            B[i] = -1 * nums.pop()
+            if len(expr.free_symbols) +1 == len(nums):
+                B[i] = -1 * nums.pop()
+            else:
+                B[i] = 0
         
         self.init_values = None
 
@@ -134,7 +151,7 @@ class EquationParser:
 
             # return method_name , num_of_equations, A, B, variables, init_values  
         
-        self.method_name = method_name
+        self.method_name = method_name.strip()
         self.num_of_equations = num_of_equations
         self.A = A
         self.B = B
@@ -146,13 +163,14 @@ class EquationParser:
 
 
 if __name__ == "__main__":
-    filename = input("Enter name of input file: ")
-    fp = EquationParser(filename)
-    fp.readFunctionFromFile(filename)
-    print(fp.method_name)
-    print(fp.num_of_equations)
-    print(fp.A)
-    print(fp.B)
-    print(fp.variables)
+    EquationParser().parseFunctions(['x+y-0' , 'y-1'])
+    # filename = input("Enter name of input file: ")
+    # fp = EquationParser(filename)
+    # fp.readFunctionFromFile(filename)
+    # print(fp.method_name)
+    # print(fp.num_of_equations)
+    # print(fp.A)
+    # print(fp.B)
+    # print(fp.variables)
 
 

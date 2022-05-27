@@ -26,6 +26,9 @@ class EquationEntryScreen(Toplevel):
         self.window_width = 750
         self.window_height = 200 + numOfEquations * 50
 
+        if metodName == constants.METHODS_NAME[3]:
+            self.window_height += 50*numOfEquations
+
         # get the screen dimension
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -86,25 +89,22 @@ class EquationEntryScreen(Toplevel):
         button = ttk.Button(self, text="Solve Equations")
         button.bind("<Button>", lambda e: self.goButtonCallback())
 
+        self.initial_values_entries = []
+        i=0
+
         if self.methodName == constants.METHODS_NAME[3]:
             # TODO : Arguments name
-            arg1Label = ttk.Label(self, text="x1", font=mediumFont)
-            arg1Entry = ttk.Entry(self, width=5, font=smallFont)
-            self.arg1Entry = arg1Entry
+            for i in range(numOfEquations):
+                
+                arg1Label = ttk.Label(self, text="x{}".format(i), font=mediumFont)
+                arg1Entry = ttk.Entry(self, width=20, font=smallFont)
+                arg1Label.grid(row=numOfEquations + i+4, column=0, padx=10, pady=10)
+                arg1Entry.grid(row=numOfEquations + i+4, column=1, padx=10, pady=10)
+                self.initial_values_entries.append(arg1Entry)
 
-            arg2Label = ttk.Label(self, text="x2", font=mediumFont)
-            arg2Entry = ttk.Entry(self, width=5, font=smallFont)
-            self.arg2Entry = arg2Entry
+           
 
-            arg3Label = ttk.Label(self, text="x2", font=mediumFont)
-            arg3Entry = ttk.Entry(self, width=5, font=smallFont)
-            self.arg3Entry = arg3Entry
-
-            arg1Label.grid(row=numOfEquations + 3, column=0, padx=10, pady=10)
-            arg2Label.grid(row=numOfEquations + 3, column=1, padx=10, pady=10)
-            arg3Label.grid(row=numOfEquations + 3, column=2, padx=10, pady=10)
-
-        button.grid(row=numOfEquations + 4, column=1, padx=10, pady=10)
+        button.grid(row=numOfEquations + i+5, column=1, padx=10, pady=10)
 
     def getEpsilon(self):
         try:
@@ -112,6 +112,13 @@ class EquationEntryScreen(Toplevel):
         except ValueError:
             messagebox.showerror("Error", "Epsilon must be a number")
             return None
+
+    def getInitailValues(self):
+        initial_values = []
+        for i in range(self.numOfEquations):
+            initial_values.append(float(self.initial_values_entries[i].get()))
+        return initial_values
+
 
     def getMethodName(self):
         return self.methodName
@@ -150,47 +157,61 @@ class EquationEntryScreen(Toplevel):
         
         results = []
 
-        if self.methodName == constants.METHODS_NAME[0]:
-            # Gaussian-elimination
-            # TODO
-            solver = EquationSolver()
-            
-            start_time = time.time()
-            results = solver.gaussElimination(np.concatenate((A, B), axis=1), len(varaibles))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+        try:
+
+            if self.getMethodName() == constants.METHODS_NAME[0]:
+                # Gaussian-elimination
+                # TODO
+                solver = EquationSolver()
+                
+                start_time = time.time()
+                results = solver.gauss_elimination(A,B, len(varaibles))
+                results = np.append(results , [0,time.time() - start_time], axis=0)
 
 
-        if self.methodName == constants.METHODS_NAME[1]:
-            # LU decomposition
-            # TODO
-            solver = EquationSolver()
-            
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+            if self.getMethodName() == constants.METHODS_NAME[1]:
+                # LU decomposition
+                # TODO
+                solver = EquationSolver()
+                
+                start_time = time.time()
+                results = solver.lu_decomp(np.concatenate((A, B), axis=1), len(varaibles))
+                # print('resulst = ',results)
+                # reshape into 1d
+                results = np.reshape(results,(len(results),))
+                
+                results = np.append(results , [0,time.time() - start_time], axis=0)
+                # print('resulst 2= ',results)
 
+                
+            if self.getMethodName() == constants.METHODS_NAME[2]:
+                # Gaussian-Jordan
+                # TODO
+                
+                solver = EquationSolver()
         
-        if self.methodName == constants.METHODS_NAME[2]:
-            # Gaussian-Jordan
-            # TODO
-            solver = EquationSolver()
-      
+                start_time = time.time()
+                results = solver.Gauss_jordan(np.concatenate((A, B), axis=1), len(varaibles))
+                # print('resulst = ',results)
+                results = np.append(results , [0,time.time() - start_time], axis=0)
+                # print('resulst 2= ',results)
+
+            if self.getMethodName() == constants.METHODS_NAME[3]:
+                # Gauss-Seidel
+                # TODO
+                print('aa')
+                solver = EquationSolver()
+                # print(parser.init_values)
+                x = np.array(self.getInitailValues())
+
+                start_time = time.time()
+                results,iterations = solver.gauss_seidal(A,B,x  , self.getEpsilon() ,  self.getNumberOfIetrations())
             
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+                results = np.append(results , [iterations,time.time() - start_time], axis=0)
 
 
-        if self.methodName == constants.METHODS_NAME[3]:
-            # Gauss-Seidel
-            # TODO
-            solver = EquationSolver()
-         
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(varaibles))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
-
-
-        
+        except:
+            messagebox.showerror("Error", "An error occured")
+            return
 
         return ResultsScreen(self, self.getMethodName(), self.numOfEquations , varaibles , results)

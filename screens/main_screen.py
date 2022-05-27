@@ -117,50 +117,67 @@ class MainScreen(tk.Tk):
         A = parser.A
         B = parser.B
         variables = parser.variables
+        results = []
 
-        if self.methodName == constants.METHODS_NAME[0]:
-            # Gaussian-elimination
-            # TODO
-            solver = EquationSolver()
-            
-            start_time = time.time()
-            results = solver.gaussElimination(np.concatenate((A, B), axis=1), len(variables))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
-
-
-        if self.methodName == constants.METHODS_NAME[1]:
-            # LU decomposition
-            # TODO
-            solver = EquationSolver()
-            
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
-
-            
-        if self.methodName == constants.METHODS_NAME[2]:
-            # Gaussian-Jordan
-            # TODO
-            solver = EquationSolver()
-    
-            
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+        # print('name = ',parser.method_name)
+        try:
+            if parser.method_name == constants.METHODS_NAME[0]:
+                # Gaussian-elimination
+                # TODO
+                solver = EquationSolver()
+                
+                start_time = time.time()
+                results = solver.gauss_elimination(A,B, len(variables))
+                results = np.append(results , [0,time.time() - start_time], axis=0)
 
 
-        if self.methodName == constants.METHODS_NAME[3]:
-            # Gauss-Seidel
-            # TODO
-            solver = EquationSolver()
+            if parser.method_name == constants.METHODS_NAME[1]:
+                # LU decomposition
+                # TODO
+                solver = EquationSolver()
+                
+                start_time = time.time()
+                results = solver.lu_decomp(np.concatenate((A, B), axis=1), len(variables))
+                print('resulst = ',results)
+                # reshape into 1d
+                results = np.reshape(results,(len(results),))
+                
+                results = np.append(results , [0,time.time() - start_time], axis=0)
+                print('resulst 2= ',results)
+
+                
+            if parser.method_name == constants.METHODS_NAME[2]:
+                # Gaussian-Jordan
+                # TODO
+                
+                solver = EquationSolver()
         
-            start_time = time.time()
-            results = solver.LUdecomposition(np.concatenate((A, B), axis=1), len(variables))
-            results+=[self.getNumberOfIetrations(),time.time() - start_time]
+                start_time = time.time()
+                results = solver.Gauss_jordan(np.concatenate((A, B), axis=1), len(variables))
+                print('resulst = ',results)
+                results = np.append(results , [0,time.time() - start_time], axis=0)
+                print('resulst 2= ',results)
+
+            if parser.method_name == constants.METHODS_NAME[3]:
+                # Gauss-Seidel
+                # TODO
+                print('aa')
+                solver = EquationSolver()
+                # print(parser.init_values)
+                x = parser.init_values
+
+                start_time = time.time()
+                results,iterations = solver.gauss_seidal(A,B,x  , 0.00001 ,  50)
+            
+                results = np.append(results , [iterations,time.time() - start_time], axis=0)
+            
+        except:
+            messagebox.showerror("Error", "Error in solving the equation")
+            return
 
 
     
-        return ResultsScreen(self , parser.method_name.strip() , int(parser.num_of_equations), parser.variables , [1,2,3,4])  
+        return ResultsScreen(self , parser.method_name.strip() , int(parser.num_of_equations), parser.variables , results=results) 
 
     def getMethodName(self):
         return self.clicked.get()
